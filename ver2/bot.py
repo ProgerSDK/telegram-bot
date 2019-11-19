@@ -56,5 +56,5 @@ def check_answer(message):
 
 if __name__ == '__main__':
     utils.count_rows()
-    random.seed()
+    # random.seed()
     bot.polling(none_stop=True)
