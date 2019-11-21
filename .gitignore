@@ -2,3 +2,6 @@
 .env
 
 /ver2/shelve.db
+/ver2/*.dat
+/ver2/*.dir
+/ver2/*.bak

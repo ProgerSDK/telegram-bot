@@ -41,15 +41,15 @@ def check_answer(message):
     # answer може бути або текст, або None
     # Якщо None:
     if not answer:
-        bot.send_message(message.chat.id, 'Чтобы начать игру, выберите команду /game')
+        bot.send_message(message.chat.id, 'Щоб почати гру, виберіть команду /game')
     else:
         # Заберемо клавіатуру з варіантами відповідей.
         keyboard_hider = types.ReplyKeyboardRemove()
         # Якщо відповідь правильна/неправильна
         if message.text == answer:
-            bot.send_message(message.chat.id, 'Верно!', reply_markup=keyboard_hider)
+            bot.send_message(message.chat.id, 'Правильно!', reply_markup=keyboard_hider)
         else:
-            bot.send_message(message.chat.id, 'Увы, Вы не угадали. Попробуйте ещё раз!', reply_markup=keyboard_hider)
+            bot.send_message(message.chat.id, 'Нажаль, Ви не вгадали. Попробуйте ще раз!', reply_markup=keyboard_hider)
         # Видаляємо юзера зі сховища (гра закінчена)
         utils.finish_user_game(message.chat.id)
 
