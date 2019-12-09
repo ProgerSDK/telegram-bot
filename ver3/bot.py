@@ -46,7 +46,8 @@ def handle_start_help(message):
 # При введенні команди '/how_old_am_i' визначимо скільки років людині на фото
 @bot.message_handler(commands=['how_old_am_i'])
 def funcname(message):
-    bot.send_message(message.chat.id, 'Для того, щоб я визначив вік, закинь мені фото на якому одна людина')
+    bot.send_message(message.chat.id, 'Для того, щоб я визначив вік, закинь мені фото на якому одна людина.\n' \
+                     + 'Якщо на фото буде декілька людей то я визначу вік випадково для когось одного.')
     # Переводимо користувача в стан надсилання фотографії для визначення віку
     dbworker.set_data(message.chat.id, config.States.S_SEND_PIC_FOR_AGE.value)
 
@@ -68,9 +69,12 @@ def sending_photo_for_age(message):
     response = apiface.model.predict([image])
 
     # Витягуємо вік з відповіді
-    age = response["outputs"][0]["data"]["regions"][0]["data"]["face"]["age_appearance"]["concepts"][0]["name"]
-    print(f'Людині на фото приблизно {age}')
-    bot.send_message(message.chat.id, f'Людині на фото приблизно {age}')
+    try:
+        age = response["outputs"][0]["data"]["regions"][0]["data"]["face"]["age_appearance"]["concepts"][0]["name"]
+        # print(f'Людині на фото приблизно {age}')
+        bot.send_message(message.chat.id, f'Людині на фото приблизно {age}')
+    except:
+        bot.send_message(message.chat.id, 'Кумедно, але на фото не людина 🧐')
 
     # Переводимо користувача в нормальний стан
     dbworker.set_data(message.chat.id, config.States.S_START.value)
