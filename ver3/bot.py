@@ -1,6 +1,7 @@
 import telebot
 import dbworker
 import config
+import apiface
 
 
 bot = telebot.TeleBot(config.token)
@@ -38,7 +39,28 @@ def handle_start_help(message):
     bot.send_message(message.chat.id, 'Можливо колись тут появиться документація, але це не точно, 🙃')
 
 
+# При введенні команди '/how_old_am_i' визначимо скільки років людині на фото
+@bot.message_handler(commands=['how_old_am_i'])
+def funcname(message):
+    bot.send_message(message.chat.id, 'Для того, щоб я визначив вік, закинь мені фото на якому одна людина')
+    dbworker.set_data(message.chat.id, config.States.S_SEND_PIC_FOR_AGE.value)
 
+
+# Аналізуємо фото користувача та визначаємо вік людини на фото
+@bot.message_handler(content_types=["photo"],
+                     func=lambda message: dbworker.get_data(message.chat.id) == config.States.S_SEND_PIC_FOR_AGE.value)
+def sending_photo_for_age(message):
+    # Те, що це фотографія, ми вже перевірили в хендлері, ніяких додаткових дій не потрібно.
+    bot.send_message(message.chat.id, "Чудово! Почекай трішки, я проаналізую фотографію та дам відповідь)")
+    
+    # response = apiface.model.predict_by_filename('example.jpg')
+    response = apiface.model.predict_by_filename(message.photo['file_id'])
+
+    age = response["outputs"][0]["data"]["regions"][0]["data"]["face"]["age_appearance"]["concepts"][0]["name"]
+    print(f'Людині на фото приблизно {age}')
+    bot.send_message(message.chat.id, f'Людині на фото приблизно {age}')
+
+    dbworker.set_state(message.chat.id, config.States.S_START.value)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,62 @@
+
+{
+  "status": {
+    "code": 10000,
+    "description": "Ok"
+  },
+  "outputs": [
+    {
+      "id": "e412c9153e724283910724208d42c9de",
+      "status": {
+        "code": 10000,
+        "description": "Ok"
+      },
+      "created_at": "2017-03-31T16:45:27.530506Z",
+      "model": {
+        "name": "demographics",
+        "id": "c0c0ac362b03416da06ab3fa36fb58e3",
+        "created_at": "2016-12-23T06:08:44.271674Z",
+        "app_id": null,
+        "output_info": {
+          "message": "Show output_info with: GET /models/{model_id}/output_info",
+          "type": "facedetect",
+          "type_ext": "facedetect"
+        },
+        "model_version": {
+          "id": "f783f0807c52474c8c6ad20c8cf45fc0",
+          "created_at": "2016-12-23T06:08:44.271674Z",
+          "status": {
+            "code": 21100,
+            "description": "Model trained successfully"
+          }
+        }
+      },
+      "input": {
+        "id": "cee4f671013545ad92585c8f5cb34bca",
+        "data": {
+          "image": {
+            "url": "https://samples.clarifai.com/demographics.jpg"
+          }
+        }
+      },
+      "data": {
+        "regions": [
+          {
+            "region_info": {
+              "bounding_box": {
+                "top_row": 0.16825931,
+                "left_col": 0.7487846,
+                "bottom_row": 0.28445584,
+                "right_col": 0.82626647
+              }
+            },
+            "data": {
+              "face": {
+                "age_appearance": {
+                  "concepts": [
+                    {
+                      "id": "ai_KFWpWmRk",
+                      "name": "36",
+                      "app_id": null,
+                      "value": 0.6135686
+                    },

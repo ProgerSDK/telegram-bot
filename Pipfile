@@ -8,6 +8,7 @@ requests = "*"
 python-dotenv = "*"
 pytelegrambotapi = "*"
 vedis = "*"
+clarifai = "*"
 
 [dev-packages]
 pylint = "*"
