@@ -17,11 +17,13 @@ def handle_start_help(message):
         dbworker.set_data(message.chat.id, config.States.S_ENTER_NAME.value)
 
 
+
 # При введенні команди '/set_name' змінимо ім'я користувача.
 @bot.message_handler(commands=['set_name'])
 def set_name(message):
     bot.send_message(message.chat.id, "Тож, як тебе звати?")
     dbworker.set_data(message.chat.id, config.States.S_ENTER_NAME.value)
+
 
 
 # Записуємо ім'я користувача
@@ -33,17 +35,21 @@ def user_entering_name(message):
     dbworker.set_data(message.chat.id, config.States.S_START.value)
 
 
+
 # При введенні команди '/help' виведемо команди для роботи з ботом.
 @bot.message_handler(commands=['help'])
 def handle_start_help(message):
     bot.send_message(message.chat.id, 'Можливо колись тут появиться документація, але це не точно, 🙃')
 
 
+
 # При введенні команди '/how_old_am_i' визначимо скільки років людині на фото
 @bot.message_handler(commands=['how_old_am_i'])
 def funcname(message):
     bot.send_message(message.chat.id, 'Для того, щоб я визначив вік, закинь мені фото на якому одна людина')
+    # Переводимо користувача в стан надсилання фотографії для визначення віку
     dbworker.set_data(message.chat.id, config.States.S_SEND_PIC_FOR_AGE.value)
+
 
 
 # Аналізуємо фото користувача та визначаємо вік людини на фото
@@ -53,14 +59,24 @@ def sending_photo_for_age(message):
     # Те, що це фотографія, ми вже перевірили в хендлері, ніяких додаткових дій не потрібно.
     bot.send_message(message.chat.id, "Чудово! Почекай трішки, я проаналізую фотографію та дам відповідь)")
     
-    # response = apiface.model.predict_by_filename('example.jpg')
-    response = apiface.model.predict_by_filename(message.photo['file_id'])
+    # Дізнаємось відносний шлях до фото
+    file_info = bot.get_file(message.photo[len(message.photo)-1].file_id)
+    # Повна URL-адреса фотографії
+    url_photo = 'https://api.telegram.org/file/bot' + config.token +  '/' + file_info.file_path
+    image = apiface.ClImage(url=url_photo)
+    # Отримуємо json-відповідь проаналізованого фото
+    response = apiface.model.predict([image])
 
+    # Витягуємо вік з відповіді
     age = response["outputs"][0]["data"]["regions"][0]["data"]["face"]["age_appearance"]["concepts"][0]["name"]
     print(f'Людині на фото приблизно {age}')
     bot.send_message(message.chat.id, f'Людині на фото приблизно {age}')
 
-    dbworker.set_state(message.chat.id, config.States.S_START.value)
+    # Переводимо користувача в нормальний стан
+    dbworker.set_data(message.chat.id, config.States.S_START.value)
+
+
+
 
 
 if __name__ == '__main__':
