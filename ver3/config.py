@@ -2,8 +2,9 @@ import os
 from enum import Enum
 
 token = os.getenv('TELEGRAM_TOKEN')
-clarifai_api_key = os.getenv('CLARIFAI_API_KEY')
 db_file = "database.vdb"
+clarifai_api_key = os.getenv('CLARIFAI_API_KEY')
+random_dog_api = 'https://random.dog/woof.json'
 
 
 class States(Enum):

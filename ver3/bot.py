@@ -2,6 +2,8 @@ import telebot
 import dbworker
 import config
 import apiface
+import requests
+import json
 
 
 bot = telebot.TeleBot(config.token)
@@ -78,6 +80,16 @@ def sending_photo_for_age(message):
 
     # Переводимо користувача в нормальний стан
     dbworker.set_data(message.chat.id, config.States.S_START.value)
+
+
+
+# При введенні команди '/random_dog' виведемо випадкове фото чи відео собаки.
+@bot.message_handler(commands=['random_dog'])
+def random_dog(message):
+    r = requests.get(url=config.random_dog_api)
+    response = r.json()
+    print(response)
+    bot.send_message(message.chat.id, response["url"])
 
 
 
