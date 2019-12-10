@@ -4,6 +4,7 @@ import config
 import apiface
 import requests
 import json
+from config import forbidden_messages
 
 
 bot = telebot.TeleBot(config.token)
@@ -88,8 +89,23 @@ def sending_photo_for_age(message):
 def random_dog(message):
     r = requests.get(url=config.random_dog_api)
     response = r.json()
-    print(response)
-    bot.send_message(message.chat.id, response["url"])
+    # print(response)
+    # bot.send_message(message.chat.id, response["url"]) # буде виводитись також посилання
+    bot.send_message(message.chat.id, f'[Random dog (Посилання)]({response["url"]})', parse_mode='markdown')
+
+
+
+# При введенні користувачем фрази з масиву 'forbidden_messages' з 'config' будемо видаляти його повідомлення
+@bot.message_handler(func=lambda message: message.text and message.text.lower() in forbidden_messages)
+def delete_user_message(message):
+    # Видаляємо повідомлення 
+    bot.delete_message(message.chat.id, message.message_id)
+
+
+# Так само видалимо повідомлення якщо воно було змінене
+@bot.edited_message_handler(func=lambda message: message.text and message.text.lower() in forbidden_messages)
+def delete_edit_message(message):
+    bot.delete_message(message.chat.id, message.message_id)
 
 
 
