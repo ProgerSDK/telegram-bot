@@ -91,7 +91,18 @@ def random_dog(message):
     response = r.json()
     # print(response)
     # bot.send_message(message.chat.id, response["url"]) # буде виводитись також посилання
-    bot.send_message(message.chat.id, f'[Random dog (Посилання)]({response["url"]})', parse_mode='markdown')
+    # bot.send_message(message.chat.id, f'[Random dog]({response["url"]})', parse_mode='markdown')
+    extension = response["url"].split('.')[-1]
+    # Якщо відео
+    if ('mp4' in extension):
+        bot.send_video(message.chat.id, response["url"])
+    # gif
+    elif ('gif' in extension):
+        bot.send_video_note(message.chat.id, response["url"])
+    # Фото
+    else:
+        bot.send_photo(message.chat.id, response["url"])
+
 
 
 
