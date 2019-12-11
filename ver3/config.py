@@ -10,6 +10,7 @@ random_dog_api = 'https://random.dog/woof.json'
 
 # Повідомлення для видалення (Заборонені)
 forbidden_messages = ["повстання машин"]
+offensive_messages = ["поганий", "тупий", "нефункціональний"]
 
 
 class States(Enum):

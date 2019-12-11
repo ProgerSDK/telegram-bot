@@ -4,7 +4,8 @@ import config
 import apiface
 import requests
 import json
-from config import forbidden_messages
+import re
+from config import forbidden_messages, offensive_messages
 
 
 bot = telebot.TeleBot(config.token)
@@ -42,7 +43,9 @@ def user_entering_name(message):
 # При введенні команди '/help' виведемо команди для роботи з ботом.
 @bot.message_handler(commands=['help'])
 def handle_start_help(message):
-    bot.send_message(message.chat.id, 'Можливо колись тут появиться документація, але це не точно, 🙃')
+    bot.send_message(message.chat.id, 'Можливо колись тут появиться документація, але це не точно 🙃 \n' \
+                     + '\nCпробуй написати "Повстання машин" 😏 \n'
+                     + '\nІ навіть не думай мене ображати 😠')
 
 
 
@@ -89,7 +92,6 @@ def sending_photo_for_age(message):
 def random_dog(message):
     r = requests.get(url=config.random_dog_api)
     response = r.json()
-    # print(response)
     # bot.send_message(message.chat.id, response["url"]) # буде виводитись також посилання
     # bot.send_message(message.chat.id, f'[Random dog]({response["url"]})', parse_mode='markdown')
     extension = response["url"].split('.')[-1]
@@ -105,18 +107,41 @@ def random_dog(message):
 
 
 
-
 # При введенні користувачем фрази з масиву 'forbidden_messages' з 'config' будемо видаляти його повідомлення
-@bot.message_handler(func=lambda message: message.text and message.text.lower() in forbidden_messages)
+@bot.message_handler(func=lambda message: message.text \
+                     and re.sub(r'\s+', ' ', message.text.lower()) in forbidden_messages)
 def delete_user_message(message):
     # Видаляємо повідомлення 
     bot.delete_message(message.chat.id, message.message_id)
 
 
 # Так само видалимо повідомлення якщо воно було змінене
-@bot.edited_message_handler(func=lambda message: message.text and message.text.lower() in forbidden_messages)
-def delete_edit_message(message):
+@bot.edited_message_handler(func=lambda message: message.text \
+                            and re.sub(r'\s+', ' ', message.text.lower()) in forbidden_messages)
+def delete_edited_message(message):
     bot.delete_message(message.chat.id, message.message_id)
+
+
+
+# При введенні користувачем образливих слів саме до бота з масиву 'offensive_messages' з 'config' 
+# будемо відповідати до нього
+@bot.message_handler(func=lambda message: message.text \
+                     and re.sub(r'\s+', ' ', message.text.lower()) \
+                     in map(lambda x: x + ' бот', offensive_messages))
+def offensive_message(message):
+    # Розіб'ємо речення на слова
+    words = re.sub(r'\s+', ' ', message.text.lower()).split()
+    # Повернемо образливе слово
+    bot.reply_to(message, f"Сам {words[0]}")
+
+
+# Так само відповімо на повідомлення яке було змінене
+@bot.edited_message_handler(func=lambda message: message.text \
+                            and re.sub(r'\s+', ' ', message.text.lower()) \
+                            in map(lambda x: x + ' бот', offensive_messages))
+def edited_offensive_message(message):
+    words = re.sub(r'\s+', ' ', message.text.lower()).split()
+    bot.reply_to(message, f"Сам {words[0]}")
 
 
 
