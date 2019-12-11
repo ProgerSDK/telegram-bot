@@ -90,9 +90,13 @@ def sending_photo_for_age(message):
 # При введенні команди '/random_dog' виведемо випадкове фото чи відео собаки.
 @bot.message_handler(commands=['random_dog'])
 def random_dog(message):
-    r = requests.get(url=config.random_dog_api)
-    response = r.json()
-    # bot.send_message(message.chat.id, response["url"]) # буде виводитись також посилання
+    try:
+        r = requests.get(url=config.random_dog_api)
+        response = r.json()
+    except:
+        bot.send_message(message.chat.id, 'Нажаль не вдалось отримати відповідь 😔')
+        return
+
     # bot.send_message(message.chat.id, f'[Random dog]({response["url"]})', parse_mode='markdown')
     extension = response["url"].split('.')[-1]
     # Якщо відео
@@ -142,6 +146,38 @@ def offensive_message(message):
 def edited_offensive_message(message):
     words = re.sub(r'\s+', ' ', message.text.lower()).split()
     bot.reply_to(message, f"Сам {words[0]}")
+
+
+
+# При введенні команди '/yes_or_no' видамо випадково так або ні користувачеві
+@bot.message_handler(commands=['yes_or_no'])
+def yes_or_no(message):
+    # Запитуємо користувача на яке питання потрібно відповісти так або ні
+    bot.send_message(message.chat.id, 'Введіть питання на яке потрібно відповісти так або ні')
+    # Переводимо користувача в стан введення запитання
+    dbworker.set_data(message.chat.id, config.States.S_ENTER_QUESTION.value)
+    
+    
+# Очікуємо на питання користувача на яке потрібно відповісти так або ні
+@bot.message_handler(func=lambda message: dbworker.get_data(message.chat.id) == config.States.S_ENTER_QUESTION.value)
+def user_entering_question(message):
+    try:
+        # Отримуємо відповідь від API
+        r = requests.get(url=config.yes_or_no_api)
+        # Декодуємо JSON
+        response = r.json()
+    except:
+        bot.send_message(message.chat.id, 'Нажаль не вдалось отримати відповідь 😔')
+        return
+
+    # Надсилаємо відповідь
+    if(response["answer"] == "yes"):
+        bot.send_message(message.chat.id, 'Так')
+    else:
+        bot.send_message(message.chat.id, 'Ні')
+
+    bot.send_video_note(message.chat.id, response["image"])
+    dbworker.set_data(message.chat.id, config.States.S_START.value)
 
 
 
