@@ -6,9 +6,13 @@ name = "pypi"
 [packages]
 requests = "*"
 python-dotenv = "*"
+pytelegrambotapi = "*"
+vedis = "*"
+clarifai = "*"
 
 [dev-packages]
 pylint = "*"
+autopep8 = "*"
 
 [requires]
 python_version = "3.7"
